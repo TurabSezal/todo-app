@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { LocalAuthGuard } from './auth.guard';
-import { Controller, Post, UseGuards, Request } from '@nestjs/common';
+import { Body } from '@nestjs/common';
+
+import { Controller, Post, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -8,8 +9,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Body() user: { email: string; password: string }) {
+    return this.authService.login(user);
   }
 }

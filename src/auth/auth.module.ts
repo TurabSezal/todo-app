@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './localstrategy';
 import { JwtStrategy } from './JwtStrategy';
@@ -12,7 +13,7 @@ import { UserModule } from '../user/user.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.local.env'] }),
     UserModule,
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,6 +23,7 @@ import { UserModule } from '../user/user.module';
       }),
     }),
   ],
+  controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
