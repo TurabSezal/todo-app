@@ -1,15 +1,15 @@
 import { GenericResponse } from './../GenericResponse/GenericResponse';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Inject, Injectable } from '@nestjs/common';
 import { Repository, DeleteResult } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @Inject('CACHE_MANAGER') private cacheManager: Cache,
   ) {}
 
   /**
@@ -44,14 +44,17 @@ export class UserService {
    * @returns User
    */
   async findOne(id: string): Promise<GenericResponse<User>> {
-    const response = await this.userRepository.findOneOrFail({
-      where: { id: id },
-    });
+    const cacheKey = `user_${id}`;
+
+    let response = await this.cacheManager.get<User>(cacheKey);
     if (!response) {
-      throw new GenericResponse(null, 'User not found', 404);
+      response = await this.userRepository.findOneOrFail({ where: { id } });
+      await this.cacheManager.set(cacheKey, response, 60);
     }
+
     return GenericResponse.success(response);
   }
+
   async findOneByMail(id: string): Promise<GenericResponse<User>> {
     const response = await this.userRepository.findOneOrFail({
       where: { id: id },
