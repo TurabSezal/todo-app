@@ -4,6 +4,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import { Cache } from 'cache-manager';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserService {
