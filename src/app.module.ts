@@ -1,5 +1,11 @@
+import { AuthMiddleware } from './auth/auth.middleware';
 import { redisStore } from 'cache-manager-redis-store';
-import { CacheModule, CacheStore, Module } from '@nestjs/common';
+import {
+  CacheModule,
+  CacheStore,
+  MiddlewareConsumer,
+  Module,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -16,7 +22,6 @@ import { AuthModule } from './auth/auth.module';
       store: redisStore as undefined as CacheStore,
       host: 'localhost',
       port: 6379,
-      ttl: 100000,
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
@@ -40,4 +45,8 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  Configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*');
+  }
+}

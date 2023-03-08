@@ -22,6 +22,15 @@ export class UserService {
   async create(
     createUserDto: CreateUserDto,
   ): Promise<GenericResponse<CreateUserDto>> {
+    const existingUser = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email = :email', { email: createUserDto.email })
+      .getOne();
+
+    if (existingUser) {
+      throw new GenericResponse(null, 'User already exists', 400);
+    }
+
     const response = await this.userRepository.save(createUserDto);
     if (!response) {
       throw new GenericResponse(null, 'Something went wrong', 404);

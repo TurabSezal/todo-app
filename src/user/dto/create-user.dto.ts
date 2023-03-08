@@ -12,4 +12,7 @@ export class CreateUserDto {
 
   @IsNumber()
   phone: string;
+
+  @IsString()
+  password: string;
 }

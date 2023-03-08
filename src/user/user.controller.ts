@@ -43,6 +43,15 @@ export class UserController {
     return this.userService.findAll();
   }
   /**
+   * @param email
+   * @returns User
+   */
+
+  @Get(':id')
+  findOne(email: string): Promise<GenericResponse<User>> {
+    return this.userService.findOneByMail(email);
+  }
+  /**
    * @param id
    * @param updateUserDto
    * @returns User

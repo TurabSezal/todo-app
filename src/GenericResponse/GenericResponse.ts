@@ -103,7 +103,6 @@ export class GenericResponse<T> extends HttpException {
   }
 
   /**
-   *
    * @param data
    * @param message
    * @param status
@@ -112,6 +111,19 @@ export class GenericResponse<T> extends HttpException {
   static internalServerError<T>(
     data: T,
     message = 'internal server error',
+    status = HttpStatus.INTERNAL_SERVER_ERROR,
+  ) {
+    return new GenericResponse(data, message, status);
+  }
+  /**
+   * @param data
+   * @param message
+   * @param status
+   * @returns {GenericResponse<T>}
+   */
+  static already<T>(
+    data: T,
+    message = 'User already exists',
     status = HttpStatus.INTERNAL_SERVER_ERROR,
   ) {
     return new GenericResponse(data, message, status);

@@ -1,31 +1,40 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
-  ttl = 100000;
-  private blacklist: string[] = [];
-
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
+  async refresh(refreshToken: string) {
+    const secret = 'your-secret-key'; 
+    const decoded = jwt.verify(refreshToken, secret) as { email: string };
+    const email = decoded.email;
+    const user = await this.userService.findOneByMail(email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    const payload = { email: decoded.email };
+    const accessToken = jwt.sign(payload, secret, { expiresIn: '15m' });
+    return accessToken;
+  }
   /**
    * @param email
    * @param password
    * @returns result
    */
+
   async validateUser(email: string, password: string): Promise<any> {
     const response = await this.userService.findOneByMail(email);
     const user = response.data;
     if (user && user.password === password) {
       const { password, ...result } = user;
-      if (user && user.email === email) {
-        return result;
-      }
+      return result;
     }
 
     return null;
@@ -43,10 +52,9 @@ export class AuthService {
   }
   /**
    * @param token
-   * @returns boolean
+   * @returns token
    */
-  async logout(token: string): Promise<boolean> {
-    this.blacklist.push(token);
-    return true;
+  async decodejwt(token: string) {
+    return this.jwtService.verify(token);
   }
 }
