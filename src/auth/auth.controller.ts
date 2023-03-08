@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { GenericResponse } from './../GenericResponse/GenericResponse';
 import { Body, CACHE_MANAGER, Inject, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Cache } from 'cache-manager';
@@ -9,7 +10,11 @@ export class AuthController {
     private readonly authService: AuthService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
-
+  /**
+   * @param email
+   * @param password
+   * @returns token
+   */
   @Post('login')
   async login(@Body() user: { email: string; password: string }) {
     const { email } = user;
@@ -19,13 +24,19 @@ export class AuthController {
       token.access_token,
       this.authService.ttl,
     );
+
     return token;
   }
-
+  /**
+   * @param email
+   * @returns string message
+   */
   @Post('logout')
-  async logout(@Body() user: { email: string }) {
+  async logout(
+    @Body() user: { email: string },
+  ): Promise<GenericResponse<string>> {
     const { email } = user;
     await this.cacheManager.del(email);
-    return { message: 'Logout successful' };
+    return GenericResponse.success('Logout succes');
   }
 }

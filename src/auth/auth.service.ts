@@ -12,9 +12,12 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly cacheManager: Cache,
   ) {}
-
+  /**
+   * @param email
+   * @param password
+   * @returns result
+   */
   async validateUser(email: string, password: string): Promise<any> {
     const response = await this.userService.findOneByMail(email);
     const user = response.data;
@@ -27,26 +30,23 @@ export class AuthService {
 
     return null;
   }
-
+  /**
+   * @param email
+   * @param password
+   * @returns token
+   */
   async login(user: any) {
     const payload = { email: user.email, sub: user.id };
     const token = this.jwtService.sign(payload);
 
-    await this.cacheManager.set(token, true);
     return { access_token: token };
   }
-
+  /**
+   * @param token
+   * @returns boolean
+   */
   async logout(token: string): Promise<boolean> {
     this.blacklist.push(token);
-    await this.cacheManager.del(token);
     return true;
-  }
-
-  async isTokenBlacklisted(token: string): Promise<boolean> {
-    if (this.blacklist.includes(token)) {
-      return true;
-    }
-    const cachedToken = await this.cacheManager.get(token);
-    return !!cachedToken;
   }
 }

@@ -1,4 +1,5 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { redisStore } from 'cache-manager-redis-store';
+import { CacheModule, CacheStore, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -12,16 +13,11 @@ import { AuthModule } from './auth/auth.module';
       envFilePath: ['.env'],
     }),
     CacheModule.register({
-      useFactory: async (configService: ConfigService) => ({
-        store: 'redis',
-        host: configService.get<string>('REDIS_HOST'),
-        port: configService.get<number>('REDIS_PORT'),
-        ttl: configService.get<number>('REDIS_TTL'),
-      }),
-    }),
-    ConfigModule.forRoot({
+      store: redisStore as undefined as CacheStore,
+      host: 'localhost',
+      port: 6379,
+      ttl: 100000,
       isGlobal: true,
-      envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

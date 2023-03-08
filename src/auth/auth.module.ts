@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { TodoModule } from './../todo/todo.module';
 import { AuthController } from './auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './localstrategy';
@@ -13,6 +14,7 @@ import { UserModule } from '../user/user.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.local.env'] }),
     UserModule,
+    TodoModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -28,5 +30,3 @@ import { UserModule } from '../user/user.module';
   exports: [AuthService],
 })
 export class AuthModule {}
-/*
- */
