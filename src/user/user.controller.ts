@@ -1,4 +1,4 @@
-import { LocalAuthGuard } from './../auth/auth.guard';
+import { JwtAuthGuard } from './../auth/jwtauth.guard';
 import { HttpExceptionFilter } from './../http-exception/http-exception.filter';
 import { DeleteResult } from 'typeorm';
 import { GenericResponse } from './../GenericResponse/GenericResponse';
@@ -19,8 +19,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard)
 @UseFilters(HttpExceptionFilter)
-@UseGuards(LocalAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
   /**
@@ -41,14 +41,6 @@ export class UserController {
   @Get()
   findAll(): Promise<GenericResponse<User[]>> {
     return this.userService.findAll();
-  }
-  /**
-   * @param id
-   * @returns User
-   */
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<GenericResponse<User>> {
-    return this.userService.findOne(id);
   }
   /**
    * @param id

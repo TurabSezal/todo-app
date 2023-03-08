@@ -1,4 +1,3 @@
-import { LocalAuthGuard } from './../auth/auth.guard';
 import { HttpExceptionFilter } from './../http-exception/http-exception.filter';
 import { DeleteResult } from 'typeorm';
 import { GenericResponse } from './../GenericResponse/GenericResponse';
@@ -18,10 +17,11 @@ import { TodoService } from './todo.service';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Todo } from './entities/todo.entity';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { JwtAuthGuard } from 'src/auth/jwtauth.guard';
 
 @Controller('todo')
+@UseGuards(JwtAuthGuard)
 @UseFilters(HttpExceptionFilter)
-@UseGuards(LocalAuthGuard)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
   /**
