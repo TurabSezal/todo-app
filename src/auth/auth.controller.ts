@@ -16,7 +16,9 @@ export class AuthController {
    * @returns token
    */
   @Post('login')
-  async login(@Body() user: { email: string; password: string }) {
+  async login(
+    @Body() user: { email: string; password: string },
+  ): Promise<GenericResponse<{ token }>> {
     const { email } = user;
     const token = await this.authService.login(user);
     await this.cacheManager.set(
@@ -25,7 +27,7 @@ export class AuthController {
       this.authService.ttl,
     );
 
-    return token;
+    return GenericResponse.success({ token });
   }
   /**
    * @param email
