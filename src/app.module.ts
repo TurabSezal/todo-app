@@ -1,3 +1,6 @@
+import { BlogModule } from './blog/blog.module';
+import { BlogTranslationsModule } from './blogtranslations/blog-translations.module';
+
 import { AuthMiddleware } from './auth/auth.middleware';
 import { redisStore } from 'cache-manager-redis-store';
 import {
@@ -11,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { TodoModule } from './todo/todo.module';
 import { AuthModule } from './auth/auth.module';
+import { LanguageModule } from './language/language.module';
 
 @Module({
   imports: [
@@ -33,8 +37,7 @@ import { AuthModule } from './auth/auth.module';
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get<boolean>('DATABASE_SYNC'),
+        synchronize: false,
         logging: configService.get<boolean>('DATABASE_LOGGING'),
         autoLoadEntities: true,
       }),
@@ -43,6 +46,9 @@ import { AuthModule } from './auth/auth.module';
     UserModule,
     TodoModule,
     AuthModule,
+    BlogTranslationsModule,
+    BlogModule,
+    LanguageModule,
   ],
 })
 export class AppModule {

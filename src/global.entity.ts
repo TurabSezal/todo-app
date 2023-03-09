@@ -34,7 +34,6 @@ export class GlobalEntity extends BaseEntity {
 
   @BeforeInsert()
   setCreatedAt() {
-    console.log(222);
     this.created_at = new Date();
   }
 

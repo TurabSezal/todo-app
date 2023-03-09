@@ -48,8 +48,8 @@ export class UserController {
    */
 
   @Get(':id')
-  findOne(email: string): Promise<GenericResponse<User>> {
-    return this.userService.findOneByMail(email);
+  findOne(id: string): Promise<GenericResponse<User>> {
+    return this.userService.findOneByMail(id);
   }
   /**
    * @param id

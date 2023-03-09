@@ -11,7 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async refresh(refreshToken: string) {
-    const secret = 'your-secret-key'; 
+    const secret = 'your-secret-key';
     const decoded = jwt.verify(refreshToken, secret) as { email: string };
     const email = decoded.email;
     const user = await this.userService.findOneByMail(email);
@@ -20,7 +20,7 @@ export class AuthService {
     }
 
     const payload = { email: decoded.email };
-    const accessToken = jwt.sign(payload, secret, { expiresIn: '15m' });
+    const accessToken = jwt.sign(payload, secret, { expiresIn: '100m' });
     return accessToken;
   }
   /**
