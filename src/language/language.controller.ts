@@ -23,9 +23,8 @@ export class LanguageController {
   constructor(private readonly languageService: LanguageService) {}
   /**
    * @param CreateLanguageDto
-   * @returns Language
+   * @returns {Promise<GenericResponse<CreateLanguageDto>>}
    */
-
   @Post()
   create(
     @Body(ValidationPipe) createLanguageDto: CreateLanguageDto,
@@ -33,7 +32,7 @@ export class LanguageController {
     return this.languageService.create(createLanguageDto);
   }
   /**
-   * @returns Language
+   * @returns {Promise<GenericResponse<Language[]>>}
    */
   @Get()
   findAll(): Promise<GenericResponse<Language[]>> {
@@ -41,7 +40,7 @@ export class LanguageController {
   }
   /**
    * @param id
-   * @returns Language
+   * @returns {Promise<GenericResponse<Language>>}
    */
   @Get(':id')
   findOneById(@Param('id') id: string): Promise<GenericResponse<Language>> {
@@ -49,7 +48,7 @@ export class LanguageController {
   }
   /**
    * @param code
-   * @returns Language
+   * @returns {Promise<GenericResponse<Language>>}
    */
   @Get(':code')
   findOneByCode(
@@ -59,8 +58,8 @@ export class LanguageController {
   }
   /**
    * @param id
-   * @param updateLanguageDto
-   * @returns Language
+   * @param CreateLanguageDto
+   * @returns {Promise<GenericResponse<Language>>}
    */
   @Patch(':id')
   update(

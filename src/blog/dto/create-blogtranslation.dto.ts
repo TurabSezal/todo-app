@@ -1,8 +1,17 @@
 /* eslint-disable prettier/prettier */
-import { BlogTranslations } from 'src/blog/entities/blog-translations.entity';
-import { IsObject } from 'class-validator';
+
+import { IsString, IsUUID } from 'class-validator';
 
 export class CreateBlogTranslationDto {
-  @IsObject()
-  public BlogTranslations: BlogTranslations;
+  @IsUUID()
+  public blog_id: string;
+
+  @IsUUID()
+  public Language_id: string;
+
+  @IsString()
+  title: string;
+
+  @IsString()
+  content: string;
 }

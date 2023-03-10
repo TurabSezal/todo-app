@@ -1,3 +1,4 @@
+import { BlogTranslations } from './blog-translations.entity';
 import { GlobalEntity } from 'src/global.entity';
 import { Column, Entity } from 'typeorm';
 
@@ -5,4 +6,6 @@ import { Column, Entity } from 'typeorm';
 export class Blog extends GlobalEntity {
   @Column()
   status: boolean;
+
+  public blogTranslations: BlogTranslations[];
 }

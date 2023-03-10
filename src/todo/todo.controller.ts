@@ -27,7 +27,7 @@ export class TodoController {
   /**
    * @param createTodoDto
    * @param userId
-   * @returns CreateTodoDto
+   * @returns {Promise<GenericResponse<CreateTodoDto>>}
    */
   @Post(':userId')
   create(
@@ -38,7 +38,7 @@ export class TodoController {
   }
   /**
    * @param userId
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo[]>>}
    */
   @Get('/find-all-not/:userId')
   findAllTodoByUserNotCompleted(
@@ -48,7 +48,7 @@ export class TodoController {
   }
   /**
    * @param userId
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo[]>>}
    */
   @Get('find-all/:userId')
   findAllTodoByUserCompleted(
@@ -66,7 +66,7 @@ export class TodoController {
   }
   /**
    * @param userId
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo>>}
    */
   @Patch(':id')
   update(
@@ -77,7 +77,7 @@ export class TodoController {
   }
   /**
    * @param id
-   * @returns boolean
+   * @returns {Promise<GenericResponse<DeleteResult>>}
    */
   @Delete(':id')
   remove(@Param('id') id: string): Promise<GenericResponse<DeleteResult>> {

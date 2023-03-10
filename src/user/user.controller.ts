@@ -25,7 +25,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   /**
    * @param CreateUserDto
-   * @returns User
+   * @returns {Promise<GenericResponse<CreateUserDto>>}
    */
 
   @Post()
@@ -35,7 +35,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
   /**
-   * @returns User
+   * @returns {Promise<GenericResponse<User[]>>}
    */
 
   @Get()
@@ -43,8 +43,8 @@ export class UserController {
     return this.userService.findAll();
   }
   /**
-   * @param email
-   * @returns User
+   * @param id
+   * @returns {Promise<GenericResponse<User>>}
    */
 
   @Get(':id')
@@ -54,7 +54,7 @@ export class UserController {
   /**
    * @param id
    * @param updateUserDto
-   * @returns User
+   * @returns {Promise<GenericResponse<User>>}
    */
   @Patch(':id')
   update(
@@ -65,7 +65,7 @@ export class UserController {
   }
   /**
    * @param id
-   * @returns boolean
+   * @returns {Promise<GenericResponse<DeleteResult>>}
    */
   @Delete(':id')
   remove(@Param('id') id: string): Promise<GenericResponse<DeleteResult>> {

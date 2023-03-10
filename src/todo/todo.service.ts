@@ -18,7 +18,7 @@ export class TodoService {
   /**
    * @param createTodoDto
    * @param userId
-   * @returns CreateTodoDto
+   * @returns {Promise<GenericResponse<CreateTodoDto>>}
    */
   async create(
     createTodoDto: CreateTodoDto,
@@ -33,7 +33,7 @@ export class TodoService {
   }
   /**
    * @param userId
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo[]>>}
    */
   async findAllTodoByCompleted(
     userId: string,
@@ -50,7 +50,7 @@ export class TodoService {
   }
   /**
    * @param userId
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo[]>>}
    */
   async findAllTodoByNotCompleted(
     userId: string,
@@ -80,7 +80,7 @@ export class TodoService {
   /**
    * @param id
    * @param UpdateTodoDto
-   * @returns Todo
+   * @returns {Promise<GenericResponse<Todo>>}
    */
   async update(
     id: string,
@@ -97,7 +97,7 @@ export class TodoService {
   }
   /**
    * @param id
-   * @returns boolean
+   * @returns {Promise<GenericResponse<DeleteResult>>}
    */
   async remove(id: string): Promise<GenericResponse<DeleteResult>> {
     const deleteResult = await this.todorepository.softDelete(id);

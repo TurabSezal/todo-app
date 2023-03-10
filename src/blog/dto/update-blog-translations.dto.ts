@@ -1,6 +1,6 @@
+import { CreateBlogTranslationDto } from './create-blogtranslation.dto';
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateBlogTranslationsDto } from './create-blog-translations.dto';
 
 export class UpdateBlogTranslationsDto extends PartialType(
-  CreateBlogTranslationsDto,
+  CreateBlogTranslationDto,
 ) {}

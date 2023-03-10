@@ -1,10 +1,9 @@
-import { BlogTranslations } from 'src/blog/entities/blog-translations.entity';
-import { CreateBlogTranslationDto } from './dto/create-blogtranslation.dto';
-import { Blog } from 'src/blog/entities/blog.entity';
+import { BlogTranslations } from './entities/blog-translations.entity';
+import { Blog } from './entities/blog.entity';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBlogDto } from './dto/create-blog.dto';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { GenericResponse } from 'src/GenericResponse/GenericResponse';
 import { Cache } from 'cache-manager';
 
@@ -22,50 +21,58 @@ export class BlogService {
   ) {}
   /**
    * @param CreateBlogDto
-   * @returns CreateBlogDto
+   * @returns {Promise<GenericResponse<CreateBlogDto>>}
    */
-  async create(createBlogDto: CreateBlogDto) {
+  async create(
+    createBlogDto: CreateBlogDto,
+  ): Promise<GenericResponse<CreateBlogDto>> {
     const response = await this.blogRepository.save(createBlogDto);
     if (!response) {
       throw new GenericResponse(null, 'Something went wrong', 404);
     }
+    if (response.translations.length > 0) {
+      for (let i = 0; i < response.translations.length; i++) {
+        const blogTranslation = {
+          ...response.translations[i],
+          blog_id: response.id,
+        };
+        console.log(blogTranslation);
 
-    return GenericResponse.created(createBlogDto);
-  }
-
-  async createtranslation(CreateBlogTranslationDto: CreateBlogTranslationDto) {
-    const response = await this.blogRepository.save(CreateBlogTranslationDto);
-    console.log(CreateBlogTranslationDto);
-
-    if (!response) {
-      throw new GenericResponse(null, 'Something went wrong', 404);
+        const translationsResponse = await this.blogTranslationRepository.save(
+          blogTranslation,
+        );
+        response.translations.find(
+          (blogTranslation) =>
+            blogTranslation.Language_id === translationsResponse.Language_id,
+        ).blog_id = response.id;
+      }
+      return GenericResponse.created(response);
     }
-
-    return GenericResponse.created(CreateBlogTranslationDto);
   }
+
   /**
-   * @returns Blog[]
+   * @returns {Promise<GenericResponse<Blog[]>>}
    */
   async findAll(): Promise<GenericResponse<Blog[]>> {
     const response = await this.blogRepository.find();
-    if (response.length === 0) {
-      throw new GenericResponse(null, 'Blog not found', 404);
+    if (!response) {
+      throw GenericResponse.notFound('Blogs not found');
     }
-    return GenericResponse.success(response);
-  }
-  /**
-   * @returns Blog[]
-   */
-  async findAllTranslations(): Promise<GenericResponse<BlogTranslations[]>> {
-    const response = await this.blogTranslationRepository.find();
-    if (response.length === 0) {
-      throw new GenericResponse(null, 'Blog not found', 404);
-    }
-    return GenericResponse.success(response);
+
+    await Promise.all(
+      response.map(async (blog) => {
+        const blogTranslations = await this.blogTranslationRepository.find({
+          where: { blog_id: blog.id },
+        });
+        blog.blogTranslations = blogTranslations;
+      }),
+    );
+
+    return GenericResponse.success<Blog[]>(response, 'Blogs found');
   }
   /**
    * @param id
-   * @returns Blog
+   * @returns {Promise<GenericResponse<Blog>>}
    */
 
   async findOneById(id: string): Promise<GenericResponse<Blog>> {
@@ -77,69 +84,72 @@ export class BlogService {
     }
     return GenericResponse.success(response);
   }
-  /**
-   * @param id
-   * @returns Blog
-   */
 
-  async findOneTranslation(
-    id: string,
-  ): Promise<GenericResponse<BlogTranslations>> {
-    const response = await this.blogTranslationRepository.findOneOrFail({
-      where: { id: id },
-    });
-    if (!response) {
-      throw new GenericResponse(null, 'Blog not found', 404);
-    }
-    return GenericResponse.success(response);
-  }
   /**
    * @param id
    * @param CreateBlogDto
-   * @returns blog
+   * @returns {Promise<GenericResponse<UpdateResult>>}
    */
-  async update(
+  async updateBlog(
     id: string,
     updateBlogDto: CreateBlogDto,
-  ): Promise<GenericResponse<Blog>> {
-    await this.blogRepository.update(id, updateBlogDto);
-    const blogDto = await this.blogRepository.findOne({
-      where: { id: id },
-    });
-    if (!blogDto) {
+  ): Promise<GenericResponse<UpdateResult>> {
+    try {
+      const response = await this.blogRepository.update({ id }, {});
+      await this.blogTranslationRepository.delete({ blog_id: id });
+      if (updateBlogDto.translations.length > 0) {
+        for (let i = 0; i < updateBlogDto.translations.length; i++) {
+          const translation = updateBlogDto.translations[i];
+          await this.blogTranslationRepository.save({
+            ...translation,
+            blog_id: id,
+          });
+        }
+      }
+      return GenericResponse.success(response, 'succes');
+    } catch (error) {
       throw GenericResponse.notFound(null, 'Something went wrong');
     }
-    return GenericResponse.success(blogDto);
-  }
-  /**
-   * @param id
-   * @param CreateBlogDto
-   * @returns blog
-   */
-  async updateTranslation(
-    id: string,
-    updateBlogTranslationDto: CreateBlogTranslationDto,
-  ): Promise<GenericResponse<BlogTranslations>> {
-    await this.blogRepository.update(id, updateBlogTranslationDto);
-    const blogTranslationDto = await this.blogTranslationRepository.findOne({
-      where: { id: id },
-    });
-    if (!blogTranslationDto) {
-      throw GenericResponse.notFound(null, 'Something went wrong');
-    }
-    return GenericResponse.success(blogTranslationDto);
   }
 
   /**
    * @param id
-   * @returns DeleteResult
+   * @returns {Promise<GenericResponse<DeleteResult>>}
    */
   async remove(id: string): Promise<GenericResponse<DeleteResult>> {
-    const response: DeleteResult = await this.blogRepository.softDelete(id);
-    const Blogexist = await this.blogRepository.exist({ where: { id: id } });
-    if (!Blogexist) {
-      throw new GenericResponse(response, 'Blog not found', 404);
+    const blogexist = await this.blogRepository.exist({
+      where: { id: id },
+    });
+
+    if (!blogexist) {
+      throw new GenericResponse(null, 'Blog not found', 404);
     }
+
+    const response: DeleteResult = await this.blogRepository.softDelete(id);
+    if (response.affected === 1) {
+      const blog = await this.blogTranslationRepository.find({
+        where: { blog_id: id },
+      });
+      if (blog.length > 0) {
+        await this.blogTranslationRepository.softRemove(blog);
+      }
+      return GenericResponse.success(response);
+    }
+    throw new GenericResponse(response, 'Something went wrong', 500);
+  }
+  /**
+   * @param id
+   * @returns {Promise<GenericResponse<DeleteResult>>}
+   */
+  async removelanguage(id: string): Promise<GenericResponse<DeleteResult>> {
+    const languageexist = await this.blogTranslationRepository.exist({
+      where: { id: id },
+    });
+    if (!languageexist) {
+      throw new GenericResponse(null, 'Blog not found', 404);
+    }
+    const response: DeleteResult =
+      await this.blogTranslationRepository.softDelete(id);
     if (response.affected === 1) {
       return GenericResponse.success(response);
     }

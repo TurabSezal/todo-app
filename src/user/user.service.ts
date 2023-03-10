@@ -17,7 +17,7 @@ export class UserService {
 
   /**
    * @param createUserDto
-   * @returns CreateUserDto
+   * @returns {Promise<GenericResponse<CreateUserDto>>}
    */
   async create(
     createUserDto: CreateUserDto,
@@ -40,7 +40,7 @@ export class UserService {
   }
 
   /**
-   * @returns User[]
+   * @returns {Promise<GenericResponse<User[]>>}
    */
   async findAll(): Promise<GenericResponse<User[]>> {
     const response = await this.userRepository.find();
@@ -64,7 +64,7 @@ export class UserService {
   /**
    * @param id
    * @param updateUserDto
-   * @returns User
+   * @returns {Promise<GenericResponse<User>>}
    */
   async update(
     id: string,
@@ -80,7 +80,7 @@ export class UserService {
 
   /**
    * @param id
-   * @returns DeleteResult
+   * @returns {Promise<GenericResponse<DeleteResult>>}
    */
   async remove(id: string): Promise<GenericResponse<DeleteResult>> {
     const response: DeleteResult = await this.userRepository.softDelete(id);

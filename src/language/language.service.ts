@@ -16,7 +16,7 @@ export class LanguageService {
   ) {}
   /**
    * @param createLanguageDto
-   * @returns CreateLanguageDto
+   * @returns {Promise<GenericResponse<CreateLanguageDto>>}
    */
   async create(
     createLanguageDto: CreateLanguageDto,
@@ -38,7 +38,7 @@ export class LanguageService {
     return GenericResponse.created(createLanguageDto);
   }
   /**
-   * @returns Language[]
+   * @returns {Promise<GenericResponse<Language[]>>}
    */
   async findAll(): Promise<GenericResponse<Language[]>> {
     const response = await this.languageRepository.find();
@@ -49,7 +49,7 @@ export class LanguageService {
   }
   /**
    * @param id
-   * @returns Language
+   * @returns {Promise<GenericResponse<Language>>}
    */
   async findOneById(id: string): Promise<GenericResponse<Language>> {
     const response = await this.languageRepository.findOneOrFail({
@@ -62,7 +62,7 @@ export class LanguageService {
   }
   /**
    * @param id
-   * @returns Language
+   * @returns {Promise<GenericResponse<Language>>}
    */
   async findOneByCode(code: string): Promise<GenericResponse<Language>> {
     const response = await this.languageRepository.findOneOrFail({
@@ -76,7 +76,7 @@ export class LanguageService {
   /**
    * @param id
    * @param updateLanguageDto
-   * @returns language
+   * @returns {Promise<GenericResponse<Language>>}
    */
   async update(
     id: string,

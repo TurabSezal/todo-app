@@ -1,6 +1,4 @@
 import { BlogModule } from './blog/blog.module';
-import { BlogTranslationsModule } from './blogtranslations/blog-translations.module';
-
 import { AuthMiddleware } from './auth/auth.middleware';
 import { redisStore } from 'cache-manager-redis-store';
 import {
@@ -46,7 +44,6 @@ import { LanguageModule } from './language/language.module';
     UserModule,
     TodoModule,
     AuthModule,
-    BlogTranslationsModule,
     BlogModule,
     LanguageModule,
   ],
